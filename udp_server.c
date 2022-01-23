@@ -26,14 +26,14 @@ void error(char *msg) {
 int main(int argc, char **argv) {
   int sockfd; /* socket */
   int portno; /* port to listen on */
-  int clientlen; /* byte size of client's address */
+  socklen_t clientlen; /* byte size of client's address */
   struct sockaddr_in serveraddr; /* server's addr */
   struct sockaddr_in clientaddr; /* client addr */
   struct hostent *hostp; /* client host info */
   char buf[BUFSIZE]; /* message buf */
   char *hostaddrp; /* dotted decimal host addr string */
   int optval; /* flag value for setsockopt */
-  int n; /* message byte size */
+  ssize_t n; /* message byte size */
 
   //set stdout buffer size to 0, for debugging purpose...CLion not flushing stdout buffer...
   setbuf(stdout, 0);
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
       error("ERROR on inet_ntoa\n");
     printf("server received datagram from %s (%s)\n", 
 	   hostp->h_name, hostaddrp);
-    printf("server received %d/%d bytes: %s\n", strlen(buf), n, buf);
+    printf("server received %lu/%d bytes: %s\n", strlen(buf), n, buf);
     
     /* 
      * sendto: echo the input back to the client 
