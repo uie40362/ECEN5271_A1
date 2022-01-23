@@ -136,59 +136,59 @@ udpserver/fast:
 	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/build
 .PHONY : udpserver/fast
 
-udp_client.o: udp_client.c.o
+Client/udp_client.o: Client/udp_client.c.o
 
-.PHONY : udp_client.o
-
-# target to build an object file
-udp_client.c.o:
-	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/udp_client.c.o
-.PHONY : udp_client.c.o
-
-udp_client.i: udp_client.c.i
-
-.PHONY : udp_client.i
-
-# target to preprocess a source file
-udp_client.c.i:
-	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/udp_client.c.i
-.PHONY : udp_client.c.i
-
-udp_client.s: udp_client.c.s
-
-.PHONY : udp_client.s
-
-# target to generate assembly for a file
-udp_client.c.s:
-	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/udp_client.c.s
-.PHONY : udp_client.c.s
-
-udp_server.o: udp_server.c.o
-
-.PHONY : udp_server.o
+.PHONY : Client/udp_client.o
 
 # target to build an object file
-udp_server.c.o:
-	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/udp_server.c.o
-.PHONY : udp_server.c.o
+Client/udp_client.c.o:
+	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/Client/udp_client.c.o
+.PHONY : Client/udp_client.c.o
 
-udp_server.i: udp_server.c.i
+Client/udp_client.i: Client/udp_client.c.i
 
-.PHONY : udp_server.i
+.PHONY : Client/udp_client.i
 
 # target to preprocess a source file
-udp_server.c.i:
-	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/udp_server.c.i
-.PHONY : udp_server.c.i
+Client/udp_client.c.i:
+	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/Client/udp_client.c.i
+.PHONY : Client/udp_client.c.i
 
-udp_server.s: udp_server.c.s
+Client/udp_client.s: Client/udp_client.c.s
 
-.PHONY : udp_server.s
+.PHONY : Client/udp_client.s
 
 # target to generate assembly for a file
-udp_server.c.s:
-	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/udp_server.c.s
-.PHONY : udp_server.c.s
+Client/udp_client.c.s:
+	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/Client/udp_client.c.s
+.PHONY : Client/udp_client.c.s
+
+Server/udp_server.o: Server/udp_server.c.o
+
+.PHONY : Server/udp_server.o
+
+# target to build an object file
+Server/udp_server.c.o:
+	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/Server/udp_server.c.o
+.PHONY : Server/udp_server.c.o
+
+Server/udp_server.i: Server/udp_server.c.i
+
+.PHONY : Server/udp_server.i
+
+# target to preprocess a source file
+Server/udp_server.c.i:
+	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/Server/udp_server.c.i
+.PHONY : Server/udp_server.c.i
+
+Server/udp_server.s: Server/udp_server.c.s
+
+.PHONY : Server/udp_server.s
+
+# target to generate assembly for a file
+Server/udp_server.c.s:
+	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/Server/udp_server.c.s
+.PHONY : Server/udp_server.c.s
 
 # Help Target
 help:
@@ -200,12 +200,12 @@ help:
 	@echo "... udpclient"
 	@echo "... edit_cache"
 	@echo "... udpserver"
-	@echo "... udp_client.o"
-	@echo "... udp_client.i"
-	@echo "... udp_client.s"
-	@echo "... udp_server.o"
-	@echo "... udp_server.i"
-	@echo "... udp_server.s"
+	@echo "... Client/udp_client.o"
+	@echo "... Client/udp_client.i"
+	@echo "... Client/udp_client.s"
+	@echo "... Server/udp_server.o"
+	@echo "... Server/udp_server.i"
+	@echo "... Server/udp_server.s"
 .PHONY : help
 
 

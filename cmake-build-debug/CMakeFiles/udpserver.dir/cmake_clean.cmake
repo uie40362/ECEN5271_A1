@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/udpserver.dir/udp_server.c.o"
+  "CMakeFiles/udpserver.dir/Server/udp_server.c.o"
   "udpserver.pdb"
   "udpserver"
 )

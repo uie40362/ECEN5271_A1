@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_server.c" "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles/udpserver.dir/udp_server.c.o"
+  "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Server/udp_server.c" "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles/udpserver.dir/Server/udp_server.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

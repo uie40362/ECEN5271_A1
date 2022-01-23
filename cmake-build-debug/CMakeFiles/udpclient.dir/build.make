@@ -57,38 +57,38 @@ include CMakeFiles/udpclient.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/udpclient.dir/flags.make
 
-CMakeFiles/udpclient.dir/udp_client.c.o: CMakeFiles/udpclient.dir/flags.make
-CMakeFiles/udpclient.dir/udp_client.c.o: ../udp_client.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/udpclient.dir/udp_client.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/udpclient.dir/udp_client.c.o   -c "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_client.c"
+CMakeFiles/udpclient.dir/Client/udp_client.c.o: CMakeFiles/udpclient.dir/flags.make
+CMakeFiles/udpclient.dir/Client/udp_client.c.o: ../Client/udp_client.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/udpclient.dir/Client/udp_client.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/udpclient.dir/Client/udp_client.c.o   -c "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Client/udp_client.c"
 
-CMakeFiles/udpclient.dir/udp_client.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/udpclient.dir/udp_client.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_client.c" > CMakeFiles/udpclient.dir/udp_client.c.i
+CMakeFiles/udpclient.dir/Client/udp_client.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/udpclient.dir/Client/udp_client.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Client/udp_client.c" > CMakeFiles/udpclient.dir/Client/udp_client.c.i
 
-CMakeFiles/udpclient.dir/udp_client.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/udpclient.dir/udp_client.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_client.c" -o CMakeFiles/udpclient.dir/udp_client.c.s
+CMakeFiles/udpclient.dir/Client/udp_client.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/udpclient.dir/Client/udp_client.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Client/udp_client.c" -o CMakeFiles/udpclient.dir/Client/udp_client.c.s
 
-CMakeFiles/udpclient.dir/udp_client.c.o.requires:
+CMakeFiles/udpclient.dir/Client/udp_client.c.o.requires:
 
-.PHONY : CMakeFiles/udpclient.dir/udp_client.c.o.requires
+.PHONY : CMakeFiles/udpclient.dir/Client/udp_client.c.o.requires
 
-CMakeFiles/udpclient.dir/udp_client.c.o.provides: CMakeFiles/udpclient.dir/udp_client.c.o.requires
-	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/udp_client.c.o.provides.build
-.PHONY : CMakeFiles/udpclient.dir/udp_client.c.o.provides
+CMakeFiles/udpclient.dir/Client/udp_client.c.o.provides: CMakeFiles/udpclient.dir/Client/udp_client.c.o.requires
+	$(MAKE) -f CMakeFiles/udpclient.dir/build.make CMakeFiles/udpclient.dir/Client/udp_client.c.o.provides.build
+.PHONY : CMakeFiles/udpclient.dir/Client/udp_client.c.o.provides
 
-CMakeFiles/udpclient.dir/udp_client.c.o.provides.build: CMakeFiles/udpclient.dir/udp_client.c.o
+CMakeFiles/udpclient.dir/Client/udp_client.c.o.provides.build: CMakeFiles/udpclient.dir/Client/udp_client.c.o
 
 
 # Object files for target udpclient
 udpclient_OBJECTS = \
-"CMakeFiles/udpclient.dir/udp_client.c.o"
+"CMakeFiles/udpclient.dir/Client/udp_client.c.o"
 
 # External object files for target udpclient
 udpclient_EXTERNAL_OBJECTS =
 
-udpclient: CMakeFiles/udpclient.dir/udp_client.c.o
+udpclient: CMakeFiles/udpclient.dir/Client/udp_client.c.o
 udpclient: CMakeFiles/udpclient.dir/build.make
 udpclient: CMakeFiles/udpclient.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable udpclient"
@@ -99,7 +99,7 @@ CMakeFiles/udpclient.dir/build: udpclient
 
 .PHONY : CMakeFiles/udpclient.dir/build
 
-CMakeFiles/udpclient.dir/requires: CMakeFiles/udpclient.dir/udp_client.c.o.requires
+CMakeFiles/udpclient.dir/requires: CMakeFiles/udpclient.dir/Client/udp_client.c.o.requires
 
 .PHONY : CMakeFiles/udpclient.dir/requires
 

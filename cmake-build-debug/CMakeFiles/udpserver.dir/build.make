@@ -57,38 +57,38 @@ include CMakeFiles/udpserver.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/udpserver.dir/flags.make
 
-CMakeFiles/udpserver.dir/udp_server.c.o: CMakeFiles/udpserver.dir/flags.make
-CMakeFiles/udpserver.dir/udp_server.c.o: ../udp_server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/udpserver.dir/udp_server.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/udpserver.dir/udp_server.c.o   -c "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_server.c"
+CMakeFiles/udpserver.dir/Server/udp_server.c.o: CMakeFiles/udpserver.dir/flags.make
+CMakeFiles/udpserver.dir/Server/udp_server.c.o: ../Server/udp_server.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/udpserver.dir/Server/udp_server.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/udpserver.dir/Server/udp_server.c.o   -c "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Server/udp_server.c"
 
-CMakeFiles/udpserver.dir/udp_server.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/udpserver.dir/udp_server.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_server.c" > CMakeFiles/udpserver.dir/udp_server.c.i
+CMakeFiles/udpserver.dir/Server/udp_server.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/udpserver.dir/Server/udp_server.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Server/udp_server.c" > CMakeFiles/udpserver.dir/Server/udp_server.c.i
 
-CMakeFiles/udpserver.dir/udp_server.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/udpserver.dir/udp_server.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/udp_server.c" -o CMakeFiles/udpserver.dir/udp_server.c.s
+CMakeFiles/udpserver.dir/Server/udp_server.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/udpserver.dir/Server/udp_server.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Server/udp_server.c" -o CMakeFiles/udpserver.dir/Server/udp_server.c.s
 
-CMakeFiles/udpserver.dir/udp_server.c.o.requires:
+CMakeFiles/udpserver.dir/Server/udp_server.c.o.requires:
 
-.PHONY : CMakeFiles/udpserver.dir/udp_server.c.o.requires
+.PHONY : CMakeFiles/udpserver.dir/Server/udp_server.c.o.requires
 
-CMakeFiles/udpserver.dir/udp_server.c.o.provides: CMakeFiles/udpserver.dir/udp_server.c.o.requires
-	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/udp_server.c.o.provides.build
-.PHONY : CMakeFiles/udpserver.dir/udp_server.c.o.provides
+CMakeFiles/udpserver.dir/Server/udp_server.c.o.provides: CMakeFiles/udpserver.dir/Server/udp_server.c.o.requires
+	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/Server/udp_server.c.o.provides.build
+.PHONY : CMakeFiles/udpserver.dir/Server/udp_server.c.o.provides
 
-CMakeFiles/udpserver.dir/udp_server.c.o.provides.build: CMakeFiles/udpserver.dir/udp_server.c.o
+CMakeFiles/udpserver.dir/Server/udp_server.c.o.provides.build: CMakeFiles/udpserver.dir/Server/udp_server.c.o
 
 
 # Object files for target udpserver
 udpserver_OBJECTS = \
-"CMakeFiles/udpserver.dir/udp_server.c.o"
+"CMakeFiles/udpserver.dir/Server/udp_server.c.o"
 
 # External object files for target udpserver
 udpserver_EXTERNAL_OBJECTS =
 
-udpserver: CMakeFiles/udpserver.dir/udp_server.c.o
+udpserver: CMakeFiles/udpserver.dir/Server/udp_server.c.o
 udpserver: CMakeFiles/udpserver.dir/build.make
 udpserver: CMakeFiles/udpserver.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable udpserver"
@@ -99,7 +99,7 @@ CMakeFiles/udpserver.dir/build: udpserver
 
 .PHONY : CMakeFiles/udpserver.dir/build
 
-CMakeFiles/udpserver.dir/requires: CMakeFiles/udpserver.dir/udp_server.c.o.requires
+CMakeFiles/udpserver.dir/requires: CMakeFiles/udpserver.dir/Server/udp_server.c.o.requires
 
 .PHONY : CMakeFiles/udpserver.dir/requires
 
