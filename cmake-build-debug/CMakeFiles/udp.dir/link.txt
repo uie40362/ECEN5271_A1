@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/udp.dir/udp_client.c.o CMakeFiles/udp.dir/udp_server.c.o  -o udp 
