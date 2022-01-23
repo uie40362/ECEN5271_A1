@@ -9,7 +9,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h> 
+#include <netdb.h>
+#include <arpa/inet.h>
 
 #define BUFSIZE 1024
 
@@ -22,13 +23,15 @@ void error(char *msg) {
 }
 
 int main(int argc, char **argv) {
-    int sockfd, portno;
+    int sockfd, portno, ip_valid;
     ssize_t n;
     socklen_t serverlen;
     struct sockaddr_in serveraddr;
     struct hostent *server;
-    char *hostname;
+//    char *hostname;
     char buf[BUFSIZE];
+    struct in_addr ipaddr;
+    char *ip;
 
     //set stdout buffer size to 0, for debugging purpose...CLion not flushing stdout buffer...
     setbuf(stdout, 0);
@@ -38,7 +41,13 @@ int main(int argc, char **argv) {
        fprintf(stderr,"usage: %s <hostname> <port>\n", argv[0]);
        exit(0);
     }
-    hostname = argv[1];
+//    hostname = argv[1];
+    ip = argv[1];
+    ip_valid = inet_aton(ip, &ipaddr);
+    if (!ip_valid){
+        error("IP not valid");
+    }
+
     portno = atoi(argv[2]);
 
     /* socket: create the socket */
@@ -46,10 +55,11 @@ int main(int argc, char **argv) {
     if (sockfd < 0) 
         error("ERROR opening socket");
 
-    /* gethostbyname: get the server's DNS entry */
-    server = gethostbyname(hostname);
+    /* gethostbyaddr: get the server based on IP Address*/
+//    server = gethostbyname(hostname);
+    server = gethostbyaddr((const void *)&ipaddr, sizeof(ipaddr), AF_INET);
     if (server == NULL) {
-        fprintf(stderr,"ERROR, no such host as %s\n", hostname);
+        fprintf(stderr,"ERROR, no such host as %s\n", ip);
         exit(0);
     }
 
