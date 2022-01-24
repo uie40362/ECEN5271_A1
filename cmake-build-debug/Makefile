@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named test12
+
+# Build rule for target.
+test12: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test12
+.PHONY : test12
+
+# fast build rule for target.
+test12/fast:
+	$(MAKE) -f CMakeFiles/test12.dir/build.make CMakeFiles/test12.dir/build
+.PHONY : test12/fast
+
+#=============================================================================
 # Target rules for targets named udpclient
 
 # Build rule for target.
@@ -190,12 +203,40 @@ Server/udp_server.c.s:
 	$(MAKE) -f CMakeFiles/udpserver.dir/build.make CMakeFiles/udpserver.dir/Server/udp_server.c.s
 .PHONY : Server/udp_server.c.s
 
+test.o: test.c.o
+
+.PHONY : test.o
+
+# target to build an object file
+test.c.o:
+	$(MAKE) -f CMakeFiles/test12.dir/build.make CMakeFiles/test12.dir/test.c.o
+.PHONY : test.c.o
+
+test.i: test.c.i
+
+.PHONY : test.i
+
+# target to preprocess a source file
+test.c.i:
+	$(MAKE) -f CMakeFiles/test12.dir/build.make CMakeFiles/test12.dir/test.c.i
+.PHONY : test.c.i
+
+test.s: test.c.s
+
+.PHONY : test.s
+
+# target to generate assembly for a file
+test.c.s:
+	$(MAKE) -f CMakeFiles/test12.dir/build.make CMakeFiles/test12.dir/test.c.s
+.PHONY : test.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... test12"
 	@echo "... rebuild_cache"
 	@echo "... udpclient"
 	@echo "... edit_cache"
@@ -206,6 +247,9 @@ help:
 	@echo "... Server/udp_server.o"
 	@echo "... Server/udp_server.i"
 	@echo "... Server/udp_server.s"
+	@echo "... test.o"
+	@echo "... test.i"
+	@echo "... test.s"
 .PHONY : help
 
 

@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/test12.dir/test.c.o  -o test12 

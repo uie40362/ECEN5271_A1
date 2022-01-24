@@ -17,6 +17,46 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="test12">
+				<Option output="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/test12" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 test12"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test12/fast">
+				<Option output="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug/test12" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 test12/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/goshe/Personal/NUS\ Matters/Y3S2/ECEN5273/Assignment/Assignment\ 1/udp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="rebuild_cache">
 				<Option working_dir="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/cmake-build-debug"/>
 				<Option type="4"/>
@@ -123,6 +163,9 @@
 		</Unit>
 		<Unit filename="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/Server/udp_server.c">
 			<Option target="udpserver"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/test.c">
+			<Option target="test12"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/goshe/Personal/NUS Matters/Y3S2/ECEN5273/Assignment/Assignment 1/udp/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>

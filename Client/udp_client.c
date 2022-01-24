@@ -6,11 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <errno.h>
+
 
 #define BUFSIZE 1024
 
@@ -21,6 +22,11 @@ void error(char *msg) {
     perror(msg);
     exit(0);
 }
+/*function prototypes*/
+int send_command(char * instr, char* argu, int fd, char buf[], struct sockaddr_in sa);
+int load_to_buffer(FILE * fp, char * buf, int size);
+
+extern int errno;
 
 int main(int argc, char **argv) {
     int sockfd, portno, ip_valid;
@@ -56,7 +62,6 @@ int main(int argc, char **argv) {
         error("ERROR opening socket");
 
     /* gethostbyaddr: get the server based on IP Address*/
-//    server = gethostbyname(hostname);
     server = gethostbyaddr((const void *)&ipaddr, sizeof(ipaddr), AF_INET);
     if (server == NULL) {
         fprintf(stderr,"ERROR, no such host as %s\n", ip);
@@ -71,9 +76,70 @@ int main(int argc, char **argv) {
     serveraddr.sin_port = htons(portno);
 
     /* get a message from the user */
-    bzero(buf, BUFSIZE);
+    /*bzero(buf, BUFSIZE);
     printf("Please enter msg: ");
-    fgets(buf, BUFSIZE, stdin);
+    fgets(buf, BUFSIZE, stdin);*/
+
+    /*Main while loop*/
+    while (1){
+        char command[50];
+        char * instr;
+        char * filename;
+
+        printf("List of commands:\nput [filename]\nget [filename]\ndelete [filename]\nls\nexit\n\nInput command:");
+        fgets(command, sizeof(command), stdin); //get input from user
+        command[strcspn(command, "\n")] = 0;    //remove trailing newline
+
+        instr = strtok(command, " ");   //determine command based on first word
+
+        /*put command*/
+        if (strcmp(instr, "put") == 0){
+            filename = strtok(NULL, " ");  //extract filename
+            //handle if no filename provided
+            if (filename == NULL) {
+                printf("No filename provided. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            /*process if file is in system*/
+            if( access( filename, F_OK ) == 0 ) {
+                //file present
+                //do nothing
+            } else {
+                // file doesn't exist
+                printf("errno %d\n", errno);
+                perror("");
+                printf("Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            /*send  put command*/
+            int sent = send_command(instr, filename, sockfd, buf, serveraddr);
+            printf("SENT COMMAND: %s %s\n", instr, filename);
+            if (sent == 1) {
+                printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            /*open and read file into buffer*/
+            FILE * fp = fopen(filename, "r");
+            int load = load_to_buffer(fp, buf, BUFSIZE);
+            if (load == 0){
+                printf("File couldn't be loaded to buffer. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            /*Send data in buffer to server*/
+            n = sendto(sockfd, buf, strlen(buf), 0, (const struct sockaddr *)&serveraddr, sizeof(serveraddr));
+            if (n < 0)
+                error("ERROR in sendto");
+        }
+
+        else{
+            printf("Invalid command. Press ENTER to continue\n");
+            getchar();
+        }
+    }
 
     /* send the message to the server */
     serverlen = sizeof(serveraddr);
@@ -86,5 +152,62 @@ int main(int argc, char **argv) {
     if (n < 0) 
       error("ERROR in recvfrom");
     printf("Echo from server: %s", buf);
+    return 0;
+}
+
+/*
+function to send command and any filenames to server
+
+args:
+ instr - instruction chosen by user i.e. put, get, etc.
+ argu - the argument, i.e. the filename
+ fd - socket file descriptor
+ buf - pointer to buffer array
+ sa - server address struct
+
+returns:
+ 0 - successfully sent command
+ 1 - unsuccessful attempt to send command
+*/
+int send_command(char * instr, char* argu, int fd, char buf[], struct sockaddr_in sa){
+    /*sending instruction to server*/
+    bzero(buf, BUFSIZE);
+    strcpy(buf, instr);
+    ssize_t n = sendto(fd, buf, strlen(buf), 0, (const struct sockaddr *)&sa, sizeof(sa));
+    if (n < 0)
+        return 1;
+    /*sending filename to server*/
+    if (argu != NULL) {
+        /*reset buffer and copy filename into it*/
+        bzero(buf, BUFSIZE);
+        strcpy(buf, argu);
+        n = sendto(fd, buf, strlen(buf), 0, (const struct sockaddr *) &sa, sizeof(sa));
+    }
+    if (n < 0)
+        return 1;
+    return 0;
+}
+
+/*function to load data to buffer from file
+ *
+ * args:
+ * fp - file pointer
+ * buf - buffer array
+ * size - size of buffer
+ *
+ * returns:
+ * 1 - successful load
+ * 0 - unsuccessful load
+ * */
+
+int load_to_buffer(FILE * fp, char * buf, int size){
+    char ch;
+    bzero(buf, BUFSIZE);
+    for (int i = 0; i<size; i++){
+        ch = fgetc(fp);
+        buf[i] = ch;
+        if (ch == EOF)
+            return 1;
+    }
     return 0;
 }

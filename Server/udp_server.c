@@ -23,6 +23,8 @@ void error(char *msg) {
   exit(1);
 }
 
+/*function prototypes*/
+
 int main(int argc, char **argv) {
   int sockfd; /* socket */
   int portno; /* port to listen on */
@@ -83,15 +85,45 @@ int main(int argc, char **argv) {
    */
   clientlen = sizeof(clientaddr);
   while (1) {
-
+    char instr[10];
+    char * filename;
+    bzero(instr, 10);
     /*
      * recvfrom: receive a UDP datagram from a client
+     * we first receive an instruction, i.e. get, put, etc.
      */
     bzero(buf, BUFSIZE);
     n = recvfrom(sockfd, buf, BUFSIZE, 0,
 		 (struct sockaddr *) &clientaddr, &clientlen);
     if (n < 0)
       error("ERROR in recvfrom");
+
+    /*process instruction from buffer*/
+    strncpy(instr, buf, 3);
+
+    /*put instruction*/
+    if (strcmp(instr, "put")==0){
+        //receive filename from put instruction
+        bzero(buf, BUFSIZE);
+        n = recvfrom(sockfd, buf, BUFSIZE, 0,
+                     (struct sockaddr *) &clientaddr, &clientlen);
+        if (n < 0)
+            error("ERROR in recvfrom");
+        //process filename
+        filename = (char *) calloc(n, sizeof(char));
+        strncpy(filename, buf, n);
+        printf("RECEIVED COMMAND: %s %s\n", instr, filename);
+
+        //create file in write mode
+        FILE * filetosave = fopen(filename, "w");
+        //receive file data
+        bzero(buf, BUFSIZE);
+        n = recvfrom(sockfd, buf, BUFSIZE, 0,
+                     (struct sockaddr *) &clientaddr, &clientlen);
+        //write to file (n-1 to ignore EOF char)
+        fwrite(buf, sizeof(char), n-1, filetosave);
+        fclose(filetosave);
+    }
 
     /* 
      * gethostbyaddr: determine who sent the datagram
@@ -110,9 +142,9 @@ int main(int argc, char **argv) {
     /* 
      * sendto: echo the input back to the client 
      */
-    n = sendto(sockfd, buf, strlen(buf), 0, 
-	       (struct sockaddr *) &clientaddr, clientlen);
-    if (n < 0) 
-      error("ERROR in sendto");
+//    n = sendto(sockfd, buf, strlen(buf), 0,
+//	       (struct sockaddr *) &clientaddr, clientlen);
+//    if (n < 0)
+//      error("ERROR in sendto");
   }
 }

@@ -5,3 +5,4 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(udpclient Client/udp_client.c)
 add_executable(udpserver Server/udp_server.c)
+add_executable(test12 test.c)
