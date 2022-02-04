@@ -15,8 +15,6 @@ string.h
 -
 unistd.h
 -
-sys/types.h
--
 sys/socket.h
 -
 netinet/in.h
@@ -26,7 +24,5 @@ netdb.h
 arpa/inet.h
 -
 errno.h
--
-dirent.h
 -
 

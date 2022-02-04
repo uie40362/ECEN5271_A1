@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 
     /* socket: create the socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0) 
+    if (sockfd < 0)
         error("ERROR opening socket");
 
     /* gethostbyaddr: get the server based on IP Address*/
@@ -105,7 +105,8 @@ int main(int argc, char **argv) {
             if( access( filename, F_OK ) == 0 ) {
                 //file present
                 //do nothing
-            } else {
+            }
+            else {
                 // file doesn't exist
                 printf("errno %d\n", errno);
                 perror("");
@@ -121,20 +122,39 @@ int main(int argc, char **argv) {
                 getchar();
                 continue;
             }
-            /*open and read file into buffer*/
+
+            /*open file and determine its size*/
             FILE * fp = fopen(filename, "r");
-            int load = load_to_buffer(fp, buf, BUFSIZE);
-            if (load == 0){
-                printf("File couldn't be loaded to buffer. Press ENTER to continue\n");
+            fseek(fp, 0, SEEK_END);
+            int size = ftell(fp);   //get size of file
+            fseek(fp, 0, SEEK_SET);
+
+            /*send file size to server*/
+            bzero(buf, BUFSIZE);
+            char * str_size;
+            sprintf(str_size, "%d", size);
+            strcpy(buf, str_size);
+            n = sendto(sockfd, buf, strlen(buf), 0, (const struct sockaddr *)&serveraddr, sizeof(serveraddr));
+            if (n < 0) {
+                printf("Data was sent unsuccessfully. Press ENTER to continue\n");
                 getchar();
                 continue;
             }
-            /*Send data in buffer to server*/
-            n = sendto(sockfd, buf, strlen(buf), 0, (const struct sockaddr *)&serveraddr, sizeof(serveraddr));
-            if (n < 0)
-                error("ERROR in sendto");
+
+            /*create data buffer and load file into buffer*/
+            char* databuf = (char *) calloc(size, sizeof(char));
+            load_to_buffer(fp, databuf, size);
+
+            /*send buffer to server*/
+            n = sendto(sockfd, databuf, size, 0, (const struct sockaddr *)&serveraddr, sizeof(serveraddr));
+            if (n < 0) {
+                printf("Data was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
         }
 
+        /*case for invalid command*/
         else{
             printf("Invalid command. Press ENTER to continue\n");
             getchar();
@@ -206,8 +226,6 @@ int load_to_buffer(FILE * fp, char * buf, int size){
     for (int i = 0; i<size; i++){
         ch = fgetc(fp);
         buf[i] = ch;
-        if (ch == EOF)
-            return 1;
     }
     return 0;
 }

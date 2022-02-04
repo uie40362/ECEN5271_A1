@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
       error("ERROR in recvfrom");
 
     /*process instruction from buffer*/
-    strncpy(instr, buf, 3);
+    strncpy(instr, buf, n);
 
     /*put instruction*/
     if (strcmp(instr, "put")==0){
@@ -116,12 +116,20 @@ int main(int argc, char **argv) {
 
         //create file in write mode
         FILE * filetosave = fopen(filename, "w");
-        //receive file data
-        bzero(buf, BUFSIZE);
+        //receive file size
         n = recvfrom(sockfd, buf, BUFSIZE, 0,
                      (struct sockaddr *) &clientaddr, &clientlen);
-        //write to file (n-1 to ignore EOF char)
-        fwrite(buf, sizeof(char), n-1, filetosave);
+        if (n < 0)
+            error("ERROR in recvfrom");
+        int file_size = atoi(buf);
+
+        //create buffer based on received file size
+        char * databuf = calloc(file_size, sizeof(char));
+
+        //receive file data and write to file
+        n = recvfrom(sockfd, databuf, file_size, 0,
+                     (struct sockaddr *) &clientaddr, &clientlen);
+        fwrite(databuf, sizeof(char), n , filetosave);
         fclose(filetosave);
     }
 
