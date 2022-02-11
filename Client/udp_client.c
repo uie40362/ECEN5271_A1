@@ -11,9 +11,19 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <sys/time.h>
 
 
 #define BUFSIZE 1024
+#define ACK 0
+#define DATA 1
+
+//structs
+struct frame{
+    int frame_type; //ACK: 0, DATA:1
+    int seq_no; //0 or 1
+    char buf[BUFSIZE]; //buffer to store payload
+};
 
 /* 
  * error - wrapper for perror
@@ -23,10 +33,11 @@ void error(char *msg) {
     exit(0);
 }
 /*function prototypes*/
-int send_command(char * instr, char* argu, int fd, char buf[], struct sockaddr_in sa);
-int load_to_buffer(FILE * fp, char * buf, int size);
+int send_wait_ack(struct frame * sendframe, struct frame * recvframe, int fd, struct sockaddr_in * sa);
 
+//globals
 extern int errno;
+int last_recv_seq;
 
 int main(int argc, char **argv) {
     int sockfd, portno, ip_valid;
@@ -85,6 +96,10 @@ int main(int argc, char **argv) {
         char command[50];
         char * instr;
         char * filename;
+        struct frame send_frame;
+        struct frame recv_frame;
+        send_frame.seq_no = 0;
+        bzero(send_frame.buf, BUFSIZE);
 
         printf("List of commands:\nput [filename]\nget [filename]\ndelete [filename]\nls\nexit\n\nInput command:");
         fgets(command, sizeof(command), stdin); //get input from user
@@ -114,14 +129,29 @@ int main(int argc, char **argv) {
                 getchar();
                 continue;
             }
+
             /*send  put command*/
-            int sent = send_command(instr, filename, sockfd, buf, serveraddr);
-            printf("SENT COMMAND: %s %s\n", instr, filename);
-            if (sent == 1) {
+            strcpy(send_frame.buf, instr);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (ackd == 1) {
                 printf("Command was sent unsuccessfully. Press ENTER to continue\n");
                 getchar();
                 continue;
             }
+            send_frame.seq_no ^= 1; //alternate seq no.
+
+
+            bzero(send_frame.buf, BUFSIZE);
+            strcpy(send_frame.buf, filename);
+
+            ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            printf("SENT COMMAND: %s %s\n", instr, filename);
+            if (ackd == 1) {
+                printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            send_frame.seq_no ^= 1; //alternate seq no.
 
             /*open file and determine its size*/
             FILE * fp = fopen(filename, "r");
@@ -129,29 +159,37 @@ int main(int argc, char **argv) {
             int size = ftell(fp);   //get size of file
             fseek(fp, 0, SEEK_SET);
 
-            /*send file size to server*/
-            bzero(buf, BUFSIZE);
-            char * str_size;
+            /*send filesize to server*/
+            bzero(send_frame.buf, BUFSIZE);
+            char str_size[BUFSIZE];
             sprintf(str_size, "%d", size);
-            strcpy(buf, str_size);
-            n = sendto(sockfd, buf, strlen(buf), 0, (const struct sockaddr *)&serveraddr, sizeof(serveraddr));
-            if (n < 0) {
-                printf("Data was sent unsuccessfully. Press ENTER to continue\n");
+            strcpy(send_frame.buf, str_size);
+            ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+
+            if (ackd ==1) {
+                printf("File size was sent unsuccessfully. Press ENTER to continue\n");
                 getchar();
                 continue;
             }
+            send_frame.seq_no ^= 1; //alternate seq no.
 
-            /*create data buffer and load file into buffer*/
-            char* databuf = (char *) calloc(size, sizeof(char));
-            load_to_buffer(fp, databuf, size);
+            /*sending file*/
+            while (size) {
+                bzero(send_frame.buf, BUFSIZE);
+                int bytes_read = fread(send_frame.buf, sizeof(char), BUFSIZE, fp);
 
-            /*send buffer to server*/
-            n = sendto(sockfd, databuf, size, 0, (const struct sockaddr *)&serveraddr, sizeof(serveraddr));
-            if (n < 0) {
-                printf("Data was sent unsuccessfully. Press ENTER to continue\n");
-                getchar();
-                continue;
+                /*send buffer to server*/
+                ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+
+                if (ackd == 1) {
+                    printf("Data was sent unsuccessfully. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+                send_frame.seq_no ^= 1; //alternate seq no.
+                size -= bytes_read;
             }
+            printf("Finished sending file\n");
         }
 
         /*case for invalid command*/
@@ -175,57 +213,36 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-/*
-function to send command and any filenames to server
+/*function to send and wait for ack*/
+int send_wait_ack(struct frame * sendframe, struct frame * recvframe, int fd, struct sockaddr_in * sa){
+    sendframe->frame_type = DATA;
+    while (1) {
+        //send packet
+        ssize_t n = sendto(fd, sendframe, sizeof(struct frame), 0, (const struct sockaddr *) sa, sizeof(*sa));
+        if (n < 0)
+            return 1;
+        /*setup select function*/
+        fd_set select_fds;
+        struct timeval timeout;
 
-args:
- instr - instruction chosen by user i.e. put, get, etc.
- argu - the argument, i.e. the filename
- fd - socket file descriptor
- buf - pointer to buffer array
- sa - server address struct
-
-returns:
- 0 - successfully sent command
- 1 - unsuccessful attempt to send command
-*/
-int send_command(char * instr, char* argu, int fd, char buf[], struct sockaddr_in sa){
-    /*sending instruction to server*/
-    bzero(buf, BUFSIZE);
-    strcpy(buf, instr);
-    ssize_t n = sendto(fd, buf, strlen(buf), 0, (const struct sockaddr *)&sa, sizeof(sa));
-    if (n < 0)
-        return 1;
-    /*sending filename to server*/
-    if (argu != NULL) {
-        /*reset buffer and copy filename into it*/
-        bzero(buf, BUFSIZE);
-        strcpy(buf, argu);
-        n = sendto(fd, buf, strlen(buf), 0, (const struct sockaddr *) &sa, sizeof(sa));
+        FD_ZERO(&select_fds);
+        FD_SET(fd, &select_fds);
+        timeout.tv_sec = 5;
+        timeout.tv_usec = 0;
+        //wait for ack otherwise timeout
+        if (select(32, &select_fds, 0, 0, &timeout) == 0){
+            printf("Timeout on receiving ACK\n");
+            continue;
+        }
+        //get ack
+        socklen_t length = sizeof(*sa);
+        ssize_t recv_size = recvfrom(fd, recvframe, sizeof(struct frame), 0, (struct sockaddr *) sa,&length);
+        if (recv_size > 0 && recvframe->seq_no == sendframe->seq_no && recvframe->frame_type == ACK)
+        {
+//            printf("ACK %d received\n", recvframe->seq_no);
+            break;
+        }
     }
-    if (n < 0)
-        return 1;
-    return 0;
-}
 
-/*function to load data to buffer from file
- *
- * args:
- * fp - file pointer
- * buf - buffer array
- * size - size of buffer
- *
- * returns:
- * 1 - successful load
- * 0 - unsuccessful load
- * */
-
-int load_to_buffer(FILE * fp, char * buf, int size){
-    char ch;
-    bzero(buf, BUFSIZE);
-    for (int i = 0; i<size; i++){
-        ch = fgetc(fp);
-        buf[i] = ch;
-    }
     return 0;
 }

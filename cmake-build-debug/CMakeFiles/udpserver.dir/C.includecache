@@ -17,8 +17,6 @@ string.h
 -
 netdb.h
 -
-sys/types.h
--
 sys/socket.h
 -
 netinet/in.h
