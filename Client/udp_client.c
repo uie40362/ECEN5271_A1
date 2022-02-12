@@ -271,6 +271,72 @@ int main(int argc, char **argv) {
             printf("RECEIVED FILE: %s\n", filename);
         }
 
+        /*delete command*/
+        else if (strcmp(instr, "delete") == 0){
+            //send instruction to server
+            strcpy(send_frame.buf, instr);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (ackd == 1) {
+                printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            //send filename to server
+            filename = strtok(NULL, " ");  //extract filename
+            bzero(send_frame.buf, BUFSIZE);
+            strcpy(send_frame.buf, filename);
+            ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (ackd == 1) {
+                printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            //receive if file exists from server
+            bzero(recv_frame.buf, BUFSIZE);
+            int recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (recvd == 1) {
+                printf("Packet not received. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            if (strcmp(recv_frame.buf, "EXISTS")==0){
+                //send OK
+                char * ok = "OK";
+                bzero(send_frame.buf, BUFSIZE);
+                strcpy(send_frame.buf, ok);
+                ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+            }
+
+            else{
+                //file doesn't exist
+                printf("%s was not found on server. Press ENTER to continue\n", filename);
+                getchar();
+                continue;
+            }
+
+            //receive if file successfully deleted
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (recvd == 1) {
+                printf("Packet not received. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            if (strcmp(recv_frame.buf, "DELETED") == 0){
+                printf("FILE SUCCESSFULLY DELETED\n");
+            }
+            else
+                printf("FILE COULD NOT BE DELETED\n");
+
+        }
+
         /*case for invalid command*/
         else{
             printf("Invalid command. Press ENTER to continue\n");

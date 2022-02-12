@@ -263,6 +263,95 @@ int main(int argc, char **argv) {
             fclose(fp);
         }
 
+        /*delete command*/
+        else if(strcmp(instr, "delete") == 0){
+            //receive filename
+            bzero(recv_frame.buf, BUFSIZE);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (recvd == 1) {
+                printf("Packet not received. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            //process filename
+            filename = (char *) calloc(strlen(recv_frame.buf), sizeof(char));
+            strncpy(filename, recv_frame.buf, strlen(recv_frame.buf));
+            printf("RECEIVED COMMAND: %s %s\n", instr, filename);
+
+            //determine if file exists
+            if( access( filename, F_OK ) == 0 ) {
+                //let client know file exists
+                char * exist = "EXISTS";
+                bzero(send_frame.buf, BUFSIZE);
+                strcpy(send_frame.buf, exist);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+            }
+            else {
+                // let client know file doesn't exist
+                char * exist = "NOEXIST";
+                bzero(send_frame.buf, BUFSIZE);
+                strcpy(send_frame.buf, exist);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+                printf("FILE: %s is not present in system\n", filename);
+                continue;
+            }
+
+            //receive OK from client
+            bzero(recv_frame.buf, BUFSIZE);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (recvd == 1) {
+                printf("Packet not received. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            //process OK
+            if (strcmp(recv_frame.buf, "OK")){
+                printf("No OK received from client. Press ENTER to continue.\n");
+                getchar();
+                continue;
+            }
+
+            //delete file
+            if (remove(filename) == 0){
+                printf("FILE DELETED SUCCESSFULLY\n");
+                //let client know file was deleted
+                char * deleted = "DELETED";
+                strcpy(send_frame.buf, deleted);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+            }
+
+            else{
+                printf("FILE DELETED UNSUCCESSFULLY\n");
+                //let client know file was not deleted
+                char * deleted = "NODELETED";
+                strcpy(send_frame.buf, deleted);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+            }
+
+
+        }
+
 
 
         /*
