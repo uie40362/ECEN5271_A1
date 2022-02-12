@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
 
 #define BUFSIZE 1024
 #define ACK 0
@@ -33,9 +34,11 @@ void error(char *msg) {
 
 /*function prototypes*/
 int recv_send_ack(struct frame * sendframe, struct frame * recvframe, int fd, struct sockaddr_in * ca);
+int send_wait_ack(struct frame * sendframe, struct frame * recvframe, int fd, struct sockaddr_in * ca);
 
 /*globals*/
 int last_recv_seq = 1;
+int last_sent_seq = 0;
 
 int main(int argc, char **argv) {
     int sockfd; /* socket */
@@ -111,7 +114,6 @@ int main(int argc, char **argv) {
             getchar();
             continue;
         }
-        last_recv_seq = recv_frame.seq_no;
 
         /*process instruction from buffer*/
         strncpy(instr, recv_frame.buf, strlen(recv_frame.buf));
@@ -127,7 +129,6 @@ int main(int argc, char **argv) {
                 getchar();
                 continue;
             }
-            last_recv_seq = recv_frame.seq_no;
 
             //process filename
             filename = (char *) calloc(strlen(recv_frame.buf), sizeof(char));
@@ -144,13 +145,12 @@ int main(int argc, char **argv) {
                 getchar();
                 continue;
             }
-            last_recv_seq = recv_frame.seq_no;
 
             //process filesize
             int filesize = atoi(recv_frame.buf);
 
             //receive file data and write to file
-            while (filesize) {
+            while (filesize>0) {
                 bzero(recv_frame.buf, BUFSIZE);
                 recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (recvd == 1) {
@@ -158,14 +158,112 @@ int main(int argc, char **argv) {
                     getchar();
                     continue;
                 }
-                last_recv_seq = recv_frame.seq_no;
 
                 int bytes_written = fwrite(recv_frame.buf, sizeof(char), BUFSIZE, filetosave);
                 filesize -= bytes_written;
             }
             fclose(filetosave);
             printf("RECEIVED FILE: %s\n", filename);
-    }
+         }
+
+        /*get instruction*/
+        else if (strcmp(instr, "get") == 0){
+            //receive filename
+            bzero(recv_frame.buf, BUFSIZE);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (recvd == 1) {
+                printf("Packet not received. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            //process filename
+            filename = (char *) calloc(strlen(recv_frame.buf), sizeof(char));
+            strncpy(filename, recv_frame.buf, strlen(recv_frame.buf));
+            printf("RECEIVED COMMAND: %s %s\n", instr, filename);
+
+            //determine if file exists
+            if( access( filename, F_OK ) == 0 ) {
+                //let client know file exists
+                char * exist = "EXISTS";
+                bzero(send_frame.buf, BUFSIZE);
+                strcpy(send_frame.buf, exist);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+            }
+            else {
+                // let client know file doesn't exist
+                char * noexist = "NOEXIST";
+                bzero(send_frame.buf, BUFSIZE);
+                strcpy(send_frame.buf, noexist);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+                printf("FILE: %s is not present in system\n", filename);
+                continue;
+            }
+
+            //receive OK from client
+            bzero(recv_frame.buf, BUFSIZE);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (recvd == 1) {
+                printf("Packet not received. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            //process OK
+            if (strcmp(recv_frame.buf, "OK")){
+                printf("Client not ready to receive file\n");
+                getchar();
+                continue;
+            }
+
+            //send filesize
+            /*open file and determine its size*/
+            FILE * fp = fopen(filename, "r");
+            fseek(fp, 0, SEEK_END);
+            int size = ftell(fp);   //get size of file
+            fseek(fp, 0, SEEK_SET);
+
+            /*send filesize to server*/
+            bzero(send_frame.buf, BUFSIZE);
+            char str_size[BUFSIZE];
+            sprintf(str_size, "%d", size);
+            strcpy(send_frame.buf, str_size);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+
+            if (ackd ==1) {
+                printf("File size was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            /*sending file*/
+            while (size) {
+                bzero(send_frame.buf, BUFSIZE);
+                int bytes_read = fread(send_frame.buf, sizeof(char), BUFSIZE, fp);
+
+                /*send buffer to server*/
+                ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+
+                if (ackd == 1) {
+                    printf("Data was sent unsuccessfully. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+                size -= bytes_read;
+            }
+            printf("Finished sending file\n");
+            fclose(fp);
+        }
+
+
 
         /*
          * gethostbyaddr: determine who sent the datagram
@@ -211,10 +309,45 @@ int recv_send_ack(struct frame * sendframe, struct frame * recvframe, int fd, st
         if (n < 0)
             return 1;
 
-        if (recvframe->seq_no != last_recv_seq)
+        if (recvframe->seq_no != last_recv_seq) {
+            last_recv_seq = recvframe->seq_no;
             break;
+        }
     }
+    return 0;
+}
 
+/*function to send packet and wait for ack*/
+int send_wait_ack(struct frame * sendframe, struct frame * recvframe, int fd, struct sockaddr_in * ca){
+    sendframe->frame_type = DATA;
+    sendframe->seq_no = last_sent_seq;
+    while (1) {
+        //send packet
+        ssize_t n = sendto(fd, sendframe, sizeof(struct frame), 0, (const struct sockaddr *) ca, sizeof(*ca));
+        if (n < 0)
+            return 1;
+        /*setup select function*/
+        fd_set select_fds;
+        struct timeval timeout;
+
+        FD_ZERO(&select_fds);
+        FD_SET(fd, &select_fds);
+        timeout.tv_sec = 5;
+        timeout.tv_usec = 0;
+        //wait for ack otherwise timeout
+        if (select(32, &select_fds, 0, 0, &timeout) == 0){
+            printf("Timeout on receiving ACK\n");
+            continue;
+        }
+        //get ack
+        socklen_t length = sizeof(*ca);
+        ssize_t recv_size = recvfrom(fd, recvframe, sizeof(struct frame), 0, (struct sockaddr *) ca,&length);
+        if (recv_size > 0 && recvframe->seq_no == sendframe->seq_no && recvframe->frame_type == ACK)
+        {
+            last_sent_seq ^= 1;
+            break;
+        }
+    }
 
     return 0;
 }
