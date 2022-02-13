@@ -187,6 +187,8 @@ int main(int argc, char **argv) {
             }
             printf("Finished sending file\n");
             fclose(fp);
+            printf("Press ENTER to continue\n");
+            getchar();
         }
 
         /*get command*/
@@ -269,6 +271,8 @@ int main(int argc, char **argv) {
             }
             fclose(writefile);
             printf("RECEIVED FILE: %s\n", filename);
+            printf("Press ENTER to continue\n");
+            getchar();
         }
 
         /*delete command*/
@@ -331,10 +335,14 @@ int main(int argc, char **argv) {
             }
             if (strcmp(recv_frame.buf, "DELETED") == 0){
                 printf("FILE SUCCESSFULLY DELETED\n");
+                printf("Press ENTER to continue\n");
+                getchar();
             }
-            else
+            else {
                 printf("FILE COULD NOT BE DELETED\n");
-
+                printf("Press ENTER to continue\n");
+                getchar();
+            }
         }
 
         /*ls command*/
@@ -362,7 +370,27 @@ int main(int argc, char **argv) {
 
                 printf("%s\n", recv_frame.buf);
             }
+            printf("Press ENTER to continue\n");
+            getchar();
+        }
 
+        /*exit*/
+        else if(strcmp(instr, "exit") == 0){
+            //send exit instruction
+            strcpy(send_frame.buf, instr);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (ackd == 1) {
+                printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            //receive SHUTDOWN message from server
+            int recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (strcmp(recv_frame.buf, "SHUTDOWN") == 0){
+                printf("SERVER SHUTDOWN. EXITING PROGRAM\n");
+                exit(0);
+            }
         }
 
         /*case for invalid command*/

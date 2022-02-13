@@ -386,6 +386,30 @@ int main(int argc, char **argv) {
                 closedir(d);
             }
         }
+        /*exit*/
+        if (strcmp(instr, "exit") == 0){
+            //send SHUTDOWN message
+            bzero(send_frame.buf, BUFSIZE);
+            char * shtdwn = "SHUTDOWN";
+            strcpy(send_frame.buf, shtdwn);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
+            if (ackd == 1) {
+                printf("Packet not sent. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+            //shutdown the server
+            int shut = close(sockfd);
+            if (shut == 0){
+                printf("SERVER SHUTDOWN. EXITING PROGRAM\n");
+                exit(0);
+            }
+            else{
+                error("SOMETHING WENT WRONG WHILE EXITING\n");
+                printf("errno %d\n", errno);
+                perror("");
+            }
+        }
     }
 }
 
