@@ -16,3 +16,8 @@ The client/server pair has the following functions
 4. ls - list all files in the server's local storage
 5. exit - exit the client program and shutdown the server
 
+Explanations:
+1. Helper functions 'send_wait_ack' and 'recv_send_ack' were used to implement stopNwait protocol with a timeout
+2. 'send_wait_ack' is used to send data across the connection, the host on the other end receives the data with 'recv_send_ack'
+3. The timeout is implemented with select() function call in 'send_wait_ack'; after a timeout of 5s for each packet of BUFSIZE 'send_wait_ack' will retransmit the packet
+4. 'recv_send_ack' simply writes the data to buffer; it then checks the sequence number of the packet and sets the sequence number for the ACK appropriately
