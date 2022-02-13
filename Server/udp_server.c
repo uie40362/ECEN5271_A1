@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <dirent.h>
 
 #define BUFSIZE 1024
 #define ACK 0
@@ -170,7 +171,7 @@ int main(int argc, char **argv) {
         else if (strcmp(instr, "get") == 0){
             //receive filename
             bzero(recv_frame.buf, BUFSIZE);
-            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
             if (recvd == 1) {
                 printf("Packet not received. Press ENTER to continue\n");
                 getchar();
@@ -187,7 +188,7 @@ int main(int argc, char **argv) {
                 char * exist = "EXISTS";
                 bzero(send_frame.buf, BUFSIZE);
                 strcpy(send_frame.buf, exist);
-                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (ackd == 1) {
                     printf("Packet not sent. Press ENTER to continue\n");
                     getchar();
@@ -199,7 +200,7 @@ int main(int argc, char **argv) {
                 char * noexist = "NOEXIST";
                 bzero(send_frame.buf, BUFSIZE);
                 strcpy(send_frame.buf, noexist);
-                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (ackd == 1) {
                     printf("Packet not sent. Press ENTER to continue\n");
                     getchar();
@@ -211,7 +212,7 @@ int main(int argc, char **argv) {
 
             //receive OK from client
             bzero(recv_frame.buf, BUFSIZE);
-            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
             if (recvd == 1) {
                 printf("Packet not received. Press ENTER to continue\n");
                 getchar();
@@ -236,7 +237,7 @@ int main(int argc, char **argv) {
             char str_size[BUFSIZE];
             sprintf(str_size, "%d", size);
             strcpy(send_frame.buf, str_size);
-            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
 
             if (ackd ==1) {
                 printf("File size was sent unsuccessfully. Press ENTER to continue\n");
@@ -250,7 +251,7 @@ int main(int argc, char **argv) {
                 int bytes_read = fread(send_frame.buf, sizeof(char), BUFSIZE, fp);
 
                 /*send buffer to server*/
-                ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
 
                 if (ackd == 1) {
                     printf("Data was sent unsuccessfully. Press ENTER to continue\n");
@@ -267,7 +268,7 @@ int main(int argc, char **argv) {
         else if(strcmp(instr, "delete") == 0){
             //receive filename
             bzero(recv_frame.buf, BUFSIZE);
-            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
             if (recvd == 1) {
                 printf("Packet not received. Press ENTER to continue\n");
                 getchar();
@@ -285,7 +286,7 @@ int main(int argc, char **argv) {
                 char * exist = "EXISTS";
                 bzero(send_frame.buf, BUFSIZE);
                 strcpy(send_frame.buf, exist);
-                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (ackd == 1) {
                     printf("Packet not sent. Press ENTER to continue\n");
                     getchar();
@@ -297,7 +298,7 @@ int main(int argc, char **argv) {
                 char * exist = "NOEXIST";
                 bzero(send_frame.buf, BUFSIZE);
                 strcpy(send_frame.buf, exist);
-                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (ackd == 1) {
                     printf("Packet not sent. Press ENTER to continue\n");
                     getchar();
@@ -309,7 +310,7 @@ int main(int argc, char **argv) {
 
             //receive OK from client
             bzero(recv_frame.buf, BUFSIZE);
-            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
             if (recvd == 1) {
                 printf("Packet not received. Press ENTER to continue\n");
                 getchar();
@@ -326,9 +327,10 @@ int main(int argc, char **argv) {
             if (remove(filename) == 0){
                 printf("FILE DELETED SUCCESSFULLY\n");
                 //let client know file was deleted
+                bzero(send_frame.buf, BUFSIZE);
                 char * deleted = "DELETED";
                 strcpy(send_frame.buf, deleted);
-                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (ackd == 1) {
                     printf("Packet not sent. Press ENTER to continue\n");
                     getchar();
@@ -341,42 +343,51 @@ int main(int argc, char **argv) {
                 //let client know file was not deleted
                 char * deleted = "NODELETED";
                 strcpy(send_frame.buf, deleted);
-                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
                 if (ackd == 1) {
                     printf("Packet not sent. Press ENTER to continue\n");
                     getchar();
                     continue;
                 }
             }
-
-
         }
 
-
-
-        /*
-         * gethostbyaddr: determine who sent the datagram
-         */
-//        hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr,
-//                  sizeof(clientaddr.sin_addr.s_addr), AF_INET);
-//        if (hostp == NULL)
-//          error("ERROR on gethostbyaddr");
-//        hostaddrp = inet_ntoa(clientaddr.sin_addr);
-//        if (hostaddrp == NULL)
-//          error("ERROR on inet_ntoa\n");
-//        printf("server received datagram from %s (%s)\n",
-//           hostp->h_name, hostaddrp);
-//        printf("server received %lu/%d bytes: %s\n", strlen(buf), n, buf);
-
-        /*
-         * sendto: echo the input back to the client
-         */
-        //    n = sendto(sockfd, buf, strlen(buf), 0,
-        //	       (struct sockaddr *) &clientaddr, clientlen);
-        //    if (n < 0)
-        //      error("ERROR in sendto");
+        /*ls command*/
+        else if (strcmp(instr, "ls") == 0){
+            printf("RECEIVED COMMAND: %s\n", instr);
+            //send file names to client
+            DIR *d;
+            struct dirent *dir;
+            d = opendir(".");
+            if (d)
+            {
+                while ((dir = readdir(d)) != NULL)
+                {
+                    printf("%s\n", dir->d_name);
+                    bzero(send_frame.buf, BUFSIZE);
+                    strcpy(send_frame.buf, dir->d_name);
+                    int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
+                    if (ackd == 1) {
+                        printf("Packet not sent. Press ENTER to continue\n");
+                        getchar();
+                        continue;
+                    }
+                }
+                //let client know once done going through files
+                bzero(send_frame.buf, BUFSIZE);
+                char * last = "LAST";
+                strcpy(send_frame.buf, last);
+                int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &clientaddr);
+                if (ackd == 1) {
+                    printf("Packet not sent. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+                closedir(d);
+            }
         }
     }
+}
 
 /*funtion to receive packet and reply with ACK*/
 

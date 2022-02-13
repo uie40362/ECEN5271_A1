@@ -337,6 +337,34 @@ int main(int argc, char **argv) {
 
         }
 
+        /*ls command*/
+        else if (strcmp(instr, "ls") ==0 ){
+            //send instruction to server
+            strcpy(send_frame.buf, instr);
+            int ackd = send_wait_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+            if (ackd == 1) {
+                printf("Command was sent unsuccessfully. Press ENTER to continue\n");
+                getchar();
+                continue;
+            }
+
+            //receive file name from server
+            while(1) {
+                bzero(recv_frame.buf, BUFSIZE);
+                int recvd = recv_send_ack(&send_frame, &recv_frame, sockfd, &serveraddr);
+                if (recvd == 1) {
+                    printf("Packet not received. Press ENTER to continue\n");
+                    getchar();
+                    continue;
+                }
+                if (strcmp(recv_frame.buf, "LAST") == 0)
+                    break;
+
+                printf("%s\n", recv_frame.buf);
+            }
+
+        }
+
         /*case for invalid command*/
         else{
             printf("Invalid command. Press ENTER to continue\n");

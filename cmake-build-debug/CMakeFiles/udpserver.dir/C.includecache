@@ -25,4 +25,6 @@ arpa/inet.h
 -
 errno.h
 -
+dirent.h
+-
 
